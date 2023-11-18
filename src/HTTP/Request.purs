@@ -157,8 +157,7 @@ else instance
   requestBody _ = Just <$> bodyToRaw BodyEmpty
   requestHeaders = (\(Headers h) -> pure h) <<< extract
 else instance
-  ( MonadEffect m
-  , TupleContaining (Effect Headers) a
+  ( TupleContaining (Effect Headers) a
   , TupleContaining URL a
   , TupleContaining Method a
   ) =>
