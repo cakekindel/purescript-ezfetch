@@ -1,19 +1,24 @@
 package:
   dependencies:
-    - prelude
     - aff
+    - aff-promise
+    - arraybuffer
+    - console
     - effect
     - either
-    - maybe
     - foldable-traversable
-    - console
+    - maybe
     - newtype
+    - node-buffer
+    - prelude
+    - simple-json
     - strings
     - stringutils
     - transformers
     - tuples
     - typelevel-prelude
-  name: project
+    - web-file
+  name: fetch
 workspace:
   extra_packages: {}
   package_set:
