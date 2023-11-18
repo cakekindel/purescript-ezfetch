@@ -25,7 +25,7 @@ import Data.Map as Map
 import Data.Maybe (Maybe(..))
 import Data.Newtype (unwrap)
 import Data.Tuple (Tuple, fst, snd)
-import Data.Tuple.Nested ((/\))
+import Data.Tuple.Nested (type (/\), (/\))
 import Effect (Effect)
 import Effect.Aff.Class (class MonadAff, liftAff)
 import Effect.Class (class MonadEffect, liftEffect)
@@ -110,10 +110,12 @@ class TupleContaining a tup where
 
 instance TupleContaining a a where
   extract = identity
-else instance TupleContaining a (Tuple a b) where
+else instance TupleContaining a (a /\ b) where
   extract = fst
-else instance TupleContaining b (Tuple a b) where
+else instance TupleContaining b (a /\ b) where
   extract = snd
+else instance TupleContaining b (a /\ b /\ Unit) where
+  extract (_ /\ b /\ _) = b
 else instance TupleContaining a tail => TupleContaining a (Tuple head tail) where
   extract (_ /\ tail) = extract tail
 
