@@ -34,7 +34,7 @@ import HTTP.Header (ContentType(..), Headers(..))
 import HTTP.Header as Header
 import HTTP.MIME (MIME)
 import HTTP.MIME as MIME
-import HTTP.URL (URL)
+import Node.URL (URL)
 import Node.Buffer (Buffer)
 import Node.Buffer as Buffer
 import Node.Encoding (Encoding(..))

@@ -10,6 +10,7 @@ package:
     - maybe
     - newtype
     - node-buffer
+    - node-url
     - prelude
     - simple-json
     - strings
