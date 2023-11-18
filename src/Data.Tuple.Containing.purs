@@ -17,6 +17,10 @@ else instance TupleContaining a (a /\ b) where
   extract = fst
 else instance TupleContaining b (a /\ b) where
   extract = snd
+else instance TupleContaining b (a /\ b /\ c) where
+  extract (_ /\ b /\ _) = b
+else instance TupleContaining c (a /\ b /\ c) where
+  extract (_ /\ _ /\ c) = c
 else instance TupleContaining b (a /\ b /\ Unit) where
   extract (_ /\ b /\ _) = b
 else instance TupleContaining a tail => TupleContaining a (Tuple head tail) where
