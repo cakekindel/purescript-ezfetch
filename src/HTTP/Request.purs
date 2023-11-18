@@ -25,6 +25,7 @@ import Data.Map as Map
 import Data.Maybe (Maybe(..))
 import Data.Newtype (unwrap)
 import Data.Tuple.Containing (class TupleContaining, extract)
+import Data.Tuple.Nested (type (/\), (/\))
 import Effect (Effect)
 import Effect.Aff.Class (class MonadAff, liftAff)
 import Effect.Class (class MonadEffect, liftEffect)
@@ -34,10 +35,10 @@ import HTTP.Header (ContentType(..), Headers(..))
 import HTTP.Header as Header
 import HTTP.MIME (MIME)
 import HTTP.MIME as MIME
-import Node.URL (URL)
 import Node.Buffer (Buffer)
 import Node.Buffer as Buffer
 import Node.Encoding (Encoding(..))
+import Node.URL (URL)
 import Simple.JSON (class WriteForeign, writeJSON)
 import Unsafe.Coerce (unsafeCoerce)
 import Web.File.Blob (Blob)
@@ -108,13 +109,7 @@ class Request a where
   requestBody :: forall m. MonadAff m => a -> m (Maybe RawRequestBody)
   requestHeaders :: forall m. MonadAff m => a -> m (Map String String)
 
-instance
-  ( TupleContaining Body a
-  , TupleContaining URL a
-  , TupleContaining Method a
-  , TupleContaining (Effect Headers) a
-  ) =>
-  Request a where
+instance Request (Method /\ URL /\ Body /\ Effect Headers) where
   requestUrl = pure <<< extract
   requestMethod = pure <<< extract
   requestBody = map Just <<< bodyToRaw <<< extract
@@ -122,13 +117,8 @@ instance
     (Headers hs) <- liftEffect $ extract req
     (Headers bodyHs) <- bodyHeaders $ extract req
     pure $ Map.union hs bodyHs
-else instance
-  ( TupleContaining Body a
-  , TupleContaining URL a
-  , TupleContaining Method a
-  , TupleContaining Headers a
-  ) =>
-  Request a where
+
+instance Request (Method /\ URL /\ Body /\ Headers) where
   requestUrl = pure <<< extract
   requestMethod = pure <<< extract
   requestBody = map Just <<< bodyToRaw <<< extract
@@ -136,50 +126,33 @@ else instance
     let (Headers hs) = extract req
     (Headers bodyHs) <- bodyHeaders $ extract req
     pure $ Map.union hs bodyHs
-else instance
-  ( TupleContaining Body a
-  , TupleContaining URL a
-  , TupleContaining Method a
-  ) =>
-  Request a where
+
+instance Request (Method /\ URL /\ Body) where
   requestUrl = pure <<< extract
   requestMethod = pure <<< extract
   requestBody = map Just <<< bodyToRaw <<< extract
   requestHeaders _ = pure Map.empty
-else instance
-  ( TupleContaining Headers a
-  , TupleContaining URL a
-  , TupleContaining Method a
-  ) =>
-  Request a where
+
+instance Request (Method /\ URL /\ Headers) where
   requestUrl = pure <<< extract
   requestMethod = pure <<< extract
   requestBody _ = Just <$> bodyToRaw BodyEmpty
   requestHeaders = (\(Headers h) -> pure h) <<< extract
-else instance
-  ( TupleContaining (Effect Headers) a
-  , TupleContaining URL a
-  , TupleContaining Method a
-  ) =>
-  Request a where
+
+instance Request (Method /\ URL /\ Effect Headers) where
   requestUrl = pure <<< extract
   requestMethod = pure <<< extract
   requestBody _ = Just <$> bodyToRaw BodyEmpty
   requestHeaders = liftEffect <<< map (\(Headers h) -> h) <<< extract @(Effect Headers)
-else instance
-  ( TupleContaining URL a
-  , TupleContaining Method a
-  ) =>
-  Request a where
+
+instance Request (Method /\ URL) where
   requestUrl = pure <<< extract
   requestMethod = pure <<< extract
   requestBody _ = Just <$> bodyToRaw BodyEmpty
   requestHeaders _ = pure Map.empty
-else instance
-  ( TupleContaining URL a
-  ) =>
-  Request a where
-  requestUrl = pure <<< extract
+
+instance Request URL where
+  requestUrl = pure
   requestMethod _ = pure GET
   requestBody _ = Just <$> bodyToRaw BodyEmpty
   requestHeaders _ = pure Map.empty
