@@ -8,7 +8,7 @@ import Data.Tuple.Nested (type (/\), (/\))
 -- | given a tuple of any size with at least 1 value
 -- | of type `a`, `extract` the first occurence of `a`
 -- | from the tuple
-class TupleContaining a tup where
+class TupleContaining @a tup where
   extract :: tup -> a
 
 instance TupleContaining a a where

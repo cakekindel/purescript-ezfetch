@@ -69,7 +69,7 @@ instance Monoid Headers where
   mempty = wrap $ Map.empty
 
 class IntoHeaders a where
-  headers :: forall m. MonadEffect m => a -> m Headers
+  headers :: a -> Effect Headers
 
 instance IntoHeaders Headers where
   headers = pure

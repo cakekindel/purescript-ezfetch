@@ -84,7 +84,7 @@ bodyHeaders (BodyEmpty) = pure mempty
 bodyHeaders (BodyString _ ct) = liftEffect $ Header.headers ct
 bodyHeaders (BodyBuffer _ ct) = liftEffect $ Header.headers ct
 bodyHeaders (BodyArrayBuffer _ ct) = liftEffect $ Header.headers ct
-bodyHeaders (BodyBlob b) = Header.headers <<< map (ContentType <<< MIME.fromString <<< unwrap) $ Blob.type_ b
+bodyHeaders (BodyBlob b) = liftEffect $ Header.headers <<< map (ContentType <<< MIME.fromString <<< unwrap) $ Blob.type_ b
 
 bodyToRaw :: forall m. MonadAff m => Body -> m RawRequestBody
 bodyToRaw (BodyString body ct) = flip bind bodyToRaw $ liftEffect $ map (flip BodyBuffer ct) $ Buffer.fromString body UTF8
@@ -109,6 +109,20 @@ class Request a where
   requestHeaders :: forall m. MonadAff m => a -> m (Map String String)
 
 instance
+  ( TupleContaining Body a
+  , TupleContaining URL a
+  , TupleContaining Method a
+  , TupleContaining (Effect Headers) a
+  ) =>
+  Request a where
+  requestUrl = pure <<< extract
+  requestMethod = pure <<< extract
+  requestBody = map Just <<< bodyToRaw <<< extract
+  requestHeaders req = do
+    (Headers hs) <- liftEffect $ extract req
+    (Headers bodyHs) <- bodyHeaders $ extract req
+    pure $ Map.union hs bodyHs
+else instance
   ( TupleContaining Body a
   , TupleContaining URL a
   , TupleContaining Method a
@@ -142,6 +156,17 @@ else instance
   requestMethod = pure <<< extract
   requestBody _ = Just <$> bodyToRaw BodyEmpty
   requestHeaders = (\(Headers h) -> pure h) <<< extract
+else instance
+  ( MonadEffect m
+  , TupleContaining (Effect Headers) a
+  , TupleContaining URL a
+  , TupleContaining Method a
+  ) =>
+  Request a where
+  requestUrl = pure <<< extract
+  requestMethod = pure <<< extract
+  requestBody _ = Just <$> bodyToRaw BodyEmpty
+  requestHeaders = liftEffect <<< map (\(Headers h) -> h) <<< extract @(Effect Headers)
 else instance
   ( TupleContaining URL a
   , TupleContaining Method a
