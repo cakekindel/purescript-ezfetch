@@ -24,6 +24,7 @@ import Data.Map (Map)
 import Data.Map as Map
 import Data.Maybe (Maybe(..))
 import Data.Newtype (unwrap)
+import Data.Nullable as Nullable
 import Data.Tuple.Containing (class TupleContaining, extract)
 import Data.Tuple.Nested (type (/\), (/\))
 import Effect (Effect)
@@ -46,6 +47,9 @@ import Web.File.Blob as Blob
 
 foreign import blobArrayBufferImpl :: Blob -> Effect (Promise ArrayBuffer)
 foreign import data RawRequestBody :: Type
+
+unsafeEmptyRawRequestBody :: RawRequestBody
+unsafeEmptyRawRequestBody = unsafeCoerce Nullable.null
 
 unsafeFormDataToRawRequestBody :: RawFormData -> RawRequestBody
 unsafeFormDataToRawRequestBody = unsafeCoerce
@@ -93,7 +97,7 @@ bodyToRaw (BodyBuffer body ct) = flip bind bodyToRaw $ liftEffect $ map (flip Bo
 bodyToRaw (BodyArrayBuffer body _) = pure $ unsafeArrayBufferToRawRequestBody body
 bodyToRaw (BodyForm form') = map unsafeFormDataToRawRequestBody $ Form.toRawFormData form'
 bodyToRaw (BodyBlob body) = unsafeBlobToRawRequestBody body
-bodyToRaw BodyEmpty = liftEffect $ map unsafeArrayBufferToRawRequestBody $ ArrayBuffer.empty 0
+bodyToRaw BodyEmpty = pure $ unsafeEmptyRawRequestBody
 
 data Method
   = GET
