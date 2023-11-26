@@ -3,21 +3,27 @@ package:
     - aff
     - aff-promise
     - arraybuffer
-    - console
+    - arraybuffer-types
+    - bifunctors
     - effect
     - either
+    - exceptions
     - foldable-traversable
+    - foreign
+    - foreign-object
+    - integers
     - maybe
     - newtype
     - node-buffer
     - node-url
+    - nullable
+    - numbers
+    - ordered-collections
     - prelude
     - simple-json
-    - strings
-    - stringutils
     - transformers
     - tuples
-    - typelevel-prelude
+    - unsafe-coerce
     - web-file
   name: fetch
 workspace:
