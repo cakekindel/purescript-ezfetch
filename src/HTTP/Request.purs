@@ -27,6 +27,7 @@ import Data.Newtype (unwrap)
 import Data.Nullable as Nullable
 import Data.Tuple.Containing (class TupleContaining, extract)
 import Data.Tuple.Nested (type (/\), (/\))
+import Data.URL (URL)
 import Effect (Effect)
 import Effect.Aff.Class (class MonadAff, liftAff)
 import Effect.Class (class MonadEffect, liftEffect)
@@ -39,7 +40,6 @@ import HTTP.MIME as MIME
 import Node.Buffer (Buffer)
 import Node.Buffer as Buffer
 import Node.Encoding (Encoding(..))
-import Node.URL (URL)
 import Simple.JSON (class WriteForeign, writeJSON)
 import Unsafe.Coerce (unsafeCoerce)
 import Web.File.Blob (Blob)

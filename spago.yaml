@@ -15,7 +15,7 @@ package:
     - maybe
     - newtype
     - node-buffer
-    - node-url
+    - url
     - nullable
     - numbers
     - ordered-collections
@@ -27,7 +27,23 @@ package:
     - web-file
   name: fetch
 workspace:
-  extra_packages: {}
+  extra_packages:
+    url:
+      git: 'https://git.orionkindel.com/thunderstrike/purescript-url-immutable.git'
+      ref: 'dbfa3b6'
+      dependencies:
+        - arrays
+        - effect
+        - filterable
+        - foldable-traversable
+        - integers
+        - maybe
+        - newtype
+        - nullable
+        - ordered-collections
+        - prelude
+        - strings
+        - tuples
   package_set:
     url: https://raw.githubusercontent.com/purescript/package-sets/psc-0.15.10-20230930/packages.json
     hash: sha256-nTsd44o7/hrTdk0c6dh0wyBqhFFDJJIeKdQU6L1zv/A=

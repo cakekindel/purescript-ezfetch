@@ -6,6 +6,7 @@ import Control.Promise (Promise)
 import Control.Promise as Promise
 import Data.Nullable (Nullable)
 import Data.Nullable as Nullable
+import Data.URL (URL)
 import Effect (Effect)
 import Effect.Aff.Class (class MonadAff, liftAff)
 import Foreign.Object (Object)
@@ -14,7 +15,6 @@ import HTTP.Header (headers) as X
 import HTTP.Request (class Request, Method(..)) as X
 import HTTP.Request as Req
 import HTTP.Response (Response)
-import Node.URL (URL)
 
 foreign import fetchImpl :: URL -> String -> Object String -> Nullable Req.RawRequestBody -> Effect (Promise Response)
 
