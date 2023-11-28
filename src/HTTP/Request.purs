@@ -20,11 +20,14 @@ import Prelude
 import Control.Promise (Promise)
 import Control.Promise as Promise
 import Data.ArrayBuffer.Types (ArrayBuffer)
+import Data.Eq.Generic (genericEq)
+import Data.Generic.Rep (class Generic)
 import Data.Map (Map)
 import Data.Map as Map
 import Data.Maybe (Maybe(..))
 import Data.Newtype (unwrap)
 import Data.Nullable as Nullable
+import Data.Show.Generic (genericShow)
 import Data.Tuple.Containing (extract)
 import Data.Tuple.Nested (type (/\))
 import Data.URL (URL)
@@ -107,6 +110,13 @@ data Method
   | POST
   | DELETE
   | PATCH
+
+derive instance Generic Method _
+instance Eq Method where
+  eq = genericEq
+
+instance Show Method where
+  show = genericShow
 
 class Request :: Type -> Constraint
 class Request a where
