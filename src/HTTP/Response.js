@@ -1,5 +1,8 @@
 /// <reference lib="dom" />
 
+/** @type {(_: Response) => () => Response} */
+export const cloneImpl = rep => () => rep.clone()
+
 /** @type {(_: Response) => () => Promise<unknown>} */
 export const jsonImpl = rep => () => rep.json()
 

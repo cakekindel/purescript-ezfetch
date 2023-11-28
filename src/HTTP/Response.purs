@@ -1,5 +1,6 @@
 module HTTP.Response
   ( Response(..)
+  , clone
   , json
   , text
   , blob
@@ -36,6 +37,7 @@ import Web.File.Blob (Blob)
 
 foreign import data Response :: Type
 
+foreign import cloneImpl :: Response -> Effect Response
 foreign import statusImpl :: Response -> Effect Int
 foreign import statusTextImpl :: Response -> Effect String
 foreign import headersImpl :: Response -> Effect (Object String)
@@ -53,6 +55,9 @@ guardStatusOk rep = do
     throwError $ error $ "status not OK: " <> show status' <> " " <> statusText'
   else
     pure unit
+
+clone :: forall m. MonadEffect m => Response -> m Response
+clone = liftEffect <<< cloneImpl
 
 json :: forall m @a. MonadAff m => ReadForeign a => Response -> m a
 json = liftAff <<< flip bind (liftEither <<< lmap (error <<< show) <<< runExcept <<< readImpl) <<< Promise.toAffE <<< jsonImpl
