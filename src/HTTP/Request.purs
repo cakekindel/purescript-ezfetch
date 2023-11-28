@@ -1,8 +1,9 @@
 module HTTP.Request
   ( class Request
-  , Body
+  , Body(..)
   , RawRequestBody
   , Method(..)
+  , bodyToRaw
   , json
   , form
   , blob
@@ -96,13 +97,13 @@ bodyHeaders (BodyBuffer _ ct) = liftEffect $ Header.headers ct
 bodyHeaders (BodyArrayBuffer _ ct) = liftEffect $ Header.headers ct
 bodyHeaders (BodyBlob b) = liftEffect $ Header.headers <<< map (ContentType <<< MIME.fromString <<< unwrap) $ Blob.type_ b
 
-bodyToRaw :: forall m. MonadAff m => Body -> m RawRequestBody
+bodyToRaw :: forall m. MonadAff m => Body -> m (Maybe RawRequestBody)
 bodyToRaw (BodyString body ct) = flip bind bodyToRaw $ liftEffect $ map (flip BodyBuffer ct) $ Buffer.fromString body UTF8
 bodyToRaw (BodyBuffer body ct) = flip bind bodyToRaw $ liftEffect $ map (flip BodyArrayBuffer ct) $ Buffer.toArrayBuffer body
-bodyToRaw (BodyArrayBuffer body _) = pure $ unsafeArrayBufferToRawRequestBody body
-bodyToRaw (BodyForm form') = map unsafeFormDataToRawRequestBody $ Form.toRawFormData form'
-bodyToRaw (BodyBlob body) = unsafeBlobToRawRequestBody body
-bodyToRaw BodyEmpty = pure $ unsafeEmptyRawRequestBody
+bodyToRaw (BodyArrayBuffer body _) = pure $ Just $ unsafeArrayBufferToRawRequestBody body
+bodyToRaw (BodyForm form') = map Just $ map unsafeFormDataToRawRequestBody $ Form.toRawFormData form'
+bodyToRaw (BodyBlob body) = map Just $ unsafeBlobToRawRequestBody body
+bodyToRaw BodyEmpty = pure Nothing
 
 data Method
   = GET
@@ -122,53 +123,53 @@ class Request :: Type -> Constraint
 class Request a where
   requestUrl :: forall m. MonadAff m => a -> m URL
   requestMethod :: forall m. MonadAff m => a -> m Method
-  requestBody :: forall m. MonadAff m => a -> m (Maybe RawRequestBody)
-  requestHeaders :: forall m. MonadAff m => a -> m (Map String String)
+  requestBody :: forall m. MonadAff m => a -> m Body
+  requestHeaders :: forall m. MonadAff m => a -> m Headers
 
 instance Request (Method /\ URL /\ Body /\ Effect Headers) where
   requestUrl = pure <<< extract
   requestMethod = pure <<< extract
-  requestBody = map Just <<< bodyToRaw <<< extract
+  requestBody = pure <<< extract
   requestHeaders req = do
-    (Headers hs) <- liftEffect $ extract req
-    (Headers bodyHs) <- bodyHeaders $ extract req
-    pure $ Map.union hs bodyHs
+    hs <- liftEffect $ extract req
+    bodyHs <- bodyHeaders $ extract req
+    pure $ hs <> bodyHs
 
 instance Request (Method /\ URL /\ Body /\ Headers) where
   requestUrl = pure <<< extract
   requestMethod = pure <<< extract
-  requestBody = map Just <<< bodyToRaw <<< extract
+  requestBody = pure <<< extract
   requestHeaders req = do
-    let (Headers hs) = extract req
-    (Headers bodyHs) <- bodyHeaders $ extract req
-    pure $ Map.union hs bodyHs
+    let hs = extract req
+    bodyHs <- bodyHeaders $ extract req
+    pure $ hs <> bodyHs
 
 instance Request (Method /\ URL /\ Body) where
   requestUrl = pure <<< extract
   requestMethod = pure <<< extract
-  requestBody = map Just <<< bodyToRaw <<< extract
-  requestHeaders _ = pure Map.empty
+  requestBody = pure <<< extract
+  requestHeaders _ = pure mempty
 
 instance Request (Method /\ URL /\ Headers) where
   requestUrl = pure <<< extract
   requestMethod = pure <<< extract
-  requestBody _ = Just <$> bodyToRaw BodyEmpty
-  requestHeaders = (\(Headers h) -> pure h) <<< extract
+  requestBody _ = pure BodyEmpty
+  requestHeaders = pure <<< extract
 
 instance Request (Method /\ URL /\ Effect Headers) where
   requestUrl = pure <<< extract
   requestMethod = pure <<< extract
-  requestBody _ = Just <$> bodyToRaw BodyEmpty
-  requestHeaders = liftEffect <<< map (\(Headers h) -> h) <<< extract @(Effect Headers)
+  requestBody _ = pure BodyEmpty
+  requestHeaders = liftEffect <<< extract @(Effect Headers)
 
 instance Request (Method /\ URL) where
   requestUrl = pure <<< extract
   requestMethod = pure <<< extract
-  requestBody _ = Just <$> bodyToRaw BodyEmpty
-  requestHeaders _ = pure Map.empty
+  requestBody _ = pure BodyEmpty
+  requestHeaders _ = pure mempty
 
 instance Request URL where
   requestUrl = pure
   requestMethod _ = pure GET
-  requestBody _ = Just <$> bodyToRaw BodyEmpty
-  requestHeaders _ = pure Map.empty
+  requestBody _ = pure BodyEmpty
+  requestHeaders _ = pure mempty

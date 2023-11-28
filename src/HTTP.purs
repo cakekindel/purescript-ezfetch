@@ -11,7 +11,9 @@ import Effect (Effect)
 import Effect.Aff.Class (class MonadAff, liftAff)
 import Foreign.Object (Object)
 import Foreign.Object as Object
+import HTTP.Header (Headers(..))
 import HTTP.Header (headers) as X
+import HTTP.Request (bodyToRaw)
 import HTTP.Request (class Request, Method(..)) as X
 import HTTP.Request as Req
 import HTTP.Response (Response)
@@ -23,7 +25,8 @@ fetch req = do
   url <- Req.requestUrl req
   method <- Req.requestMethod req
   body <- Req.requestBody req
-  headers <- Req.requestHeaders req
+  bodyRaw <- bodyToRaw body
+  Headers headers <- Req.requestHeaders req
 
   let
     methodStr = case method of
@@ -34,4 +37,4 @@ fetch req = do
       Req.DELETE -> "DELETE"
     headers' = Object.fromFoldableWithIndex headers
 
-  liftAff $ Promise.toAffE $ fetchImpl url methodStr headers' $ Nullable.toNullable body
+  liftAff $ Promise.toAffE $ fetchImpl url methodStr headers' $ Nullable.toNullable bodyRaw
