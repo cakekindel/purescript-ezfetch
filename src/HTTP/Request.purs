@@ -12,21 +12,21 @@ module HTTP.Request
   , requestHeaders
   , requestUrl
   , requestMethod
+  , rawRequestBodySize
   ) where
 
 import Prelude
 
 import Control.Promise (Promise)
 import Control.Promise as Promise
-import Data.ArrayBuffer.ArrayBuffer as ArrayBuffer
 import Data.ArrayBuffer.Types (ArrayBuffer)
 import Data.Map (Map)
 import Data.Map as Map
 import Data.Maybe (Maybe(..))
 import Data.Newtype (unwrap)
 import Data.Nullable as Nullable
-import Data.Tuple.Containing (class TupleContaining, extract)
-import Data.Tuple.Nested (type (/\), (/\))
+import Data.Tuple.Containing (extract)
+import Data.Tuple.Nested (type (/\))
 import Data.URL (URL)
 import Effect (Effect)
 import Effect.Aff.Class (class MonadAff, liftAff)
@@ -45,8 +45,10 @@ import Unsafe.Coerce (unsafeCoerce)
 import Web.File.Blob (Blob)
 import Web.File.Blob as Blob
 
-foreign import blobArrayBufferImpl :: Blob -> Effect (Promise ArrayBuffer)
 foreign import data RawRequestBody :: Type
+
+foreign import blobArrayBufferImpl :: Blob -> Effect (Promise ArrayBuffer)
+foreign import rawRequestBodySize :: RawRequestBody -> Effect Int
 
 unsafeEmptyRawRequestBody :: RawRequestBody
 unsafeEmptyRawRequestBody = unsafeCoerce Nullable.null
