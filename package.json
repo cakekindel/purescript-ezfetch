@@ -14,5 +14,8 @@
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "optionalDependencies": {
+    "fetch-socks": "^1.2.0"
+  }
 }
