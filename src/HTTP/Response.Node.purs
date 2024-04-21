@@ -11,10 +11,10 @@ import Control.Promise as Promise
 import Effect (Effect)
 import Effect.Aff.Class (class MonadAff, liftAff)
 import Effect.Class (class MonadEffect, liftEffect)
-import HTTP.Response (Response, stream)
+import HTTP.Response (Response)
 import HTTP.Response hiding (stream) as X
 import Node.Buffer (Buffer)
-import Node.Stream (Stream, Readable)
+import Node.Stream (Readable)
 
 foreign import bufferImpl :: Response -> Effect (Promise Buffer)
 foreign import streamImpl :: Response -> Effect (Readable ())
