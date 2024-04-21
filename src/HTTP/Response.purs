@@ -1,5 +1,6 @@
 module HTTP.Response
   ( Response(..)
+  , stream
   , clone
   , json
   , text
@@ -18,7 +19,7 @@ import Control.Monad.Error.Class (class MonadThrow, liftEither, throwError)
 import Control.Monad.Except (runExcept)
 import Control.Promise (Promise)
 import Control.Promise as Promise
-import Data.ArrayBuffer.Types (ArrayBuffer)
+import Data.ArrayBuffer.Types (ArrayBuffer, ArrayView, Uint8)
 import Data.Bifunctor (lmap)
 import Data.Int as Int
 import Data.Map (Map)
@@ -34,6 +35,7 @@ import HTTP.Form (Form, RawFormData)
 import HTTP.Form as Form
 import Simple.JSON (class ReadForeign, readImpl)
 import Web.File.Blob (Blob)
+import Web.Streams.ReadableStream (ReadableStream)
 
 foreign import data Response :: Type
 
@@ -46,6 +48,7 @@ foreign import textImpl :: Response -> Effect (Promise String)
 foreign import abImpl :: Response -> Effect (Promise ArrayBuffer)
 foreign import blobImpl :: Response -> Effect (Promise Blob)
 foreign import formImpl :: Response -> Effect (Promise RawFormData)
+foreign import streamImpl :: Response -> Effect (ReadableStream (ArrayView Uint8))
 
 guardStatusOk :: forall m. MonadAff m => MonadThrow Error m => Response -> m Unit
 guardStatusOk rep = do
@@ -67,6 +70,9 @@ text = liftAff <<< Promise.toAffE <<< textImpl
 
 blob :: forall m. MonadAff m => Response -> m Blob
 blob = liftAff <<< Promise.toAffE <<< blobImpl
+
+stream :: forall m. MonadEffect m => Response -> m (ReadableStream (ArrayView Uint8))
+stream = liftEffect <<< streamImpl
 
 arrayBuffer :: forall m. MonadAff m => Response -> m ArrayBuffer
 arrayBuffer = liftAff <<< Promise.toAffE <<< abImpl

@@ -3,6 +3,9 @@
 /** @type {(_: Response) => () => Response} */
 export const cloneImpl = rep => () => rep.clone()
 
+/** @type {(_: Response) => () => ReadableStream} */
+export const streamImpl = rep => () => rep.body
+
 /** @type {(_: Response) => () => Promise<unknown>} */
 export const jsonImpl = rep => () => rep.json()
 
