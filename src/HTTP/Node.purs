@@ -35,6 +35,7 @@ fetchProxy pxy req = do
       Req.POST -> "POST"
       Req.PATCH -> "PATCH"
       Req.DELETE -> "DELETE"
+      Req.HEAD -> "HEAD"
     headers' = Object.fromFoldableWithIndex headers
 
   liftAff $ Promise.toAffE $ fetchImpl pxy url methodStr headers' $ Nullable.toNullable bodyRaw

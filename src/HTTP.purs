@@ -35,6 +35,7 @@ fetch req = do
       Req.POST -> "POST"
       Req.PATCH -> "PATCH"
       Req.DELETE -> "DELETE"
+      Req.HEAD -> "HEAD"
     headers' = Object.fromFoldableWithIndex headers
 
   liftAff $ Promise.toAffE $ fetchImpl url methodStr headers' $ Nullable.toNullable bodyRaw

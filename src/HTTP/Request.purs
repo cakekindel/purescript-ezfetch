@@ -111,6 +111,7 @@ data Method
   | POST
   | DELETE
   | PATCH
+  | HEAD
 
 derive instance Generic Method _
 instance Eq Method where
