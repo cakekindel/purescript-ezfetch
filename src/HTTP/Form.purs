@@ -2,14 +2,12 @@ module HTTP.Form where
 
 import Prelude
 
-import Control.Monad.Error.Class (liftMaybe, try)
+import Control.Monad.Error.Class (liftMaybe)
 import Control.Monad.Except (runExcept)
 import Control.Promise (Promise)
 import Control.Promise as Promise
-import Data.ArrayBuffer.ArrayBuffer as ArrayBuffer
 import Data.ArrayBuffer.Types (ArrayBuffer)
 import Data.Either (hush)
-import Data.Foldable (foldl)
 import Data.FoldableWithIndex (foldlWithIndex)
 import Data.Generic.Rep (class Generic)
 import Data.Map (Map)
@@ -20,19 +18,15 @@ import Data.Nullable (Nullable)
 import Data.Nullable as Nullable
 import Data.Show.Generic (genericShow)
 import Data.Traversable (for)
-import Data.Tuple (Tuple(..))
 import Effect (Effect)
-import Effect.Aff (Aff)
 import Effect.Aff.Class (class MonadAff, liftAff)
 import Effect.Class (class MonadEffect, liftEffect)
 import Effect.Exception (error)
 import Foreign (Foreign, unsafeReadTagged, unsafeToForeign)
 import Foreign.Object (Object)
 import Foreign.Object as Object
-import HTTP.Header as Header
 import HTTP.MIME (MIME)
 import HTTP.MIME as MIME
-import Node.Buffer.Immutable (ImmutableBuffer)
 import Simple.JSON (readImpl, unsafeStringify)
 import Unsafe.Coerce (unsafeCoerce)
 import Web.File.Blob (Blob)

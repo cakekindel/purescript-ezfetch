@@ -7,6 +7,7 @@ workspace:
         - aff-promise
         - arraybuffer
         - arraybuffer-types
+        - b64
         - bifunctors
         - effect
         - either
@@ -37,6 +38,7 @@ workspace:
         - arraybuffer
         - arraybuffer-types
         - arrays
+        - b64
         - bifunctors
         - const
         - contravariant
@@ -45,6 +47,7 @@ workspace:
         - distributive
         - effect
         - either
+        - encoding
         - enums
         - exceptions
         - exists
@@ -5802,6 +5805,20 @@ packages:
       - tuples
       - unfoldable
       - unsafe-coerce
+  b64:
+    type: git
+    url: https://github.com/menelaos/purescript-b64.git
+    rev: 1d66c26733ed5924bcab8901204245daac0f2952
+    dependencies:
+      - arraybuffer-types
+      - either
+      - encoding
+      - enums
+      - exceptions
+      - functions
+      - partial
+      - prelude
+      - strings
   bifunctors:
     type: git
     url: https://github.com/purescript/purescript-bifunctors.git
@@ -5882,6 +5899,16 @@ packages:
       - control
       - invariant
       - maybe
+      - prelude
+  encoding:
+    type: git
+    url: https://github.com/menelaos/purescript-encoding.git
+    rev: a9d1913de736821c133ecd7944a08b2ab07ad774
+    dependencies:
+      - arraybuffer-types
+      - either
+      - exceptions
+      - functions
       - prelude
   enums:
     type: git

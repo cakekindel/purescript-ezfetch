@@ -4,6 +4,7 @@ package:
     - aff-promise
     - arraybuffer
     - arraybuffer-types
+    - b64
     - bifunctors
     - effect
     - either

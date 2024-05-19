@@ -2,6 +2,7 @@ module HTTP.Header where
 
 import Prelude
 
+import Control.Monad.Error.Class (liftEither)
 import Data.Eq.Generic (genericEq)
 import Data.Generic.Rep (class Generic)
 import Data.Map (Map)
@@ -9,13 +10,12 @@ import Data.Map as Map
 import Data.Maybe (Maybe, maybe)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Data.Show.Generic (genericShow)
+import Data.String.Base64 as String.Base64
 import Data.Tuple (Tuple(..))
 import Effect (Effect)
 import Effect.Class (class MonadEffect, liftEffect)
 import HTTP.MIME (MIME)
 import HTTP.MIME as MIME
-import Node.Buffer as Buffer
-import Node.Encoding (Encoding(..))
 
 newtype ContentType = ContentType MIME
 
@@ -50,8 +50,7 @@ instance Eq Authorization where
 
 authorizationValue :: forall m. MonadEffect m => Authorization -> m String
 authorizationValue (AuthBasic { username, password }) = do
-  buf <- liftEffect $ Buffer.fromString (username <> ":" <> password) UTF8
-  val <- liftEffect $ Buffer.toString Base64 buf
+  val <- liftEffect $ liftEither $ String.Base64.btoa $ username <> ":" <> password
   authorizationValue $ AuthCustom (wrap "Basic") val
 authorizationValue (AuthBearer val) = authorizationValue $ AuthCustom (wrap "Bearer") val
 authorizationValue (AuthCustom (AuthScheme scheme) val) = pure $ scheme <> " " <> val

@@ -7,7 +7,6 @@ module HTTP.Request
   , json
   , form
   , blob
-  , buffer
   , arrayBuffer
   , requestBody
   , requestHeaders
@@ -23,8 +22,6 @@ import Control.Promise as Promise
 import Data.ArrayBuffer.Types (ArrayBuffer)
 import Data.Eq.Generic (genericEq)
 import Data.Generic.Rep (class Generic)
-import Data.Map (Map)
-import Data.Map as Map
 import Data.Maybe (Maybe(..))
 import Data.Newtype (unwrap)
 import Data.Nullable as Nullable
@@ -37,13 +34,10 @@ import Effect.Aff.Class (class MonadAff, liftAff)
 import Effect.Class (class MonadEffect, liftEffect)
 import HTTP.Form (Form, RawFormData)
 import HTTP.Form as Form
-import HTTP.Header (ContentType(..), Headers(..))
+import HTTP.Header (ContentType(..), Headers)
 import HTTP.Header as Header
 import HTTP.MIME (MIME)
 import HTTP.MIME as MIME
-import Node.Buffer (Buffer)
-import Node.Buffer as Buffer
-import Node.Encoding (Encoding(..))
 import Simple.JSON (class WriteForeign, writeJSON)
 import Unsafe.Coerce (unsafeCoerce)
 import Web.File.Blob (Blob)
@@ -57,6 +51,9 @@ foreign import rawRequestBodySize :: RawRequestBody -> Effect Int
 unsafeEmptyRawRequestBody :: RawRequestBody
 unsafeEmptyRawRequestBody = unsafeCoerce Nullable.null
 
+unsafeStringRawRequestBody :: String -> RawRequestBody
+unsafeStringRawRequestBody = unsafeCoerce
+
 unsafeFormDataToRawRequestBody :: RawFormData -> RawRequestBody
 unsafeFormDataToRawRequestBody = unsafeCoerce
 
@@ -69,7 +66,6 @@ unsafeBlobToRawRequestBody = map unsafeArrayBufferToRawRequestBody <<< liftAff <
 data Body
   = BodyString String (Maybe ContentType)
   | BodyArrayBuffer ArrayBuffer (Maybe ContentType)
-  | BodyBuffer Buffer (Maybe ContentType)
   | BodyBlob Blob
   | BodyForm Form
   | BodyEmpty
@@ -83,9 +79,6 @@ form = BodyForm
 blob :: Blob -> Body
 blob = BodyBlob
 
-buffer :: MIME -> Buffer -> Body
-buffer mime buf = BodyBuffer buf $ Just $ ContentType mime
-
 arrayBuffer :: MIME -> ArrayBuffer -> Body
 arrayBuffer mime buf = BodyArrayBuffer buf $ Just $ ContentType mime
 
@@ -93,13 +86,11 @@ bodyHeaders :: forall m. MonadEffect m => Body -> m Headers
 bodyHeaders (BodyForm _) = pure mempty
 bodyHeaders (BodyEmpty) = pure mempty
 bodyHeaders (BodyString _ ct) = liftEffect $ Header.headers ct
-bodyHeaders (BodyBuffer _ ct) = liftEffect $ Header.headers ct
 bodyHeaders (BodyArrayBuffer _ ct) = liftEffect $ Header.headers ct
 bodyHeaders (BodyBlob b) = liftEffect $ Header.headers <<< map (ContentType <<< MIME.fromString <<< unwrap) $ Blob.type_ b
 
 bodyToRaw :: forall m. MonadAff m => Body -> m (Maybe RawRequestBody)
-bodyToRaw (BodyString body ct) = flip bind bodyToRaw $ liftEffect $ map (flip BodyBuffer ct) $ Buffer.fromString body UTF8
-bodyToRaw (BodyBuffer body ct) = flip bind bodyToRaw $ liftEffect $ map (flip BodyArrayBuffer ct) $ Buffer.toArrayBuffer body
+bodyToRaw (BodyString body _) = pure $ Just $ unsafeStringRawRequestBody body
 bodyToRaw (BodyArrayBuffer body _) = pure $ Just $ unsafeArrayBufferToRawRequestBody body
 bodyToRaw (BodyForm form') = map Just $ map unsafeFormDataToRawRequestBody $ Form.toRawFormData form'
 bodyToRaw (BodyBlob body) = map Just $ unsafeBlobToRawRequestBody body
