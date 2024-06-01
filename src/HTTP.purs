@@ -1,4 +1,4 @@
-module HTTP (fetch, module X) where
+module HTTP (fetch, fetchWithDefaults, OptionalFields, module X) where
 
 import Prelude
 
