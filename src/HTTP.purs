@@ -65,11 +65,11 @@ fetch
   => Nub o OptionalFields
   => Union x OptionalFields o
   => Union x xm OptionalFields
-  => URL
-  -> Method
+  => Method
+  -> URL
   -> {|x}
   -> m Response
-fetch url method x = do
+fetch method url x = do
   let
     methodStr = case method of
       Req.GET -> "GET"
