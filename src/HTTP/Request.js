@@ -5,7 +5,7 @@ export const blobArrayBufferImpl = b => () => b.arrayBuffer()
 const formDataValueSize = v => (typeof v === 'string' ? v.length : v.size)
 
 /** @type {(_: ArrayBuffer | FormData) => () => number} */
-export const rawRequestBodySize = body => () =>
+export const rawBodySize = body => () =>
   body instanceof ArrayBuffer
     ? body.byteLength
     : body instanceof FormData
