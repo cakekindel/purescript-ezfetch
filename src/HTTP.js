@@ -1,3 +1,13 @@
-/** @type {(_: string) => (_: string) => (_: Record<string, string>) => (_: null | string | FormData) => () => Promise<Response>} */
-export const fetchImpl = url => method => headers => body => () =>
-  fetch(url, { redirect: 'manual', body, method, headers })
+/**
+ * @typedef {{
+ *   body: string | ArrayBuffer | Blob | FormData | null,
+ *   headers: Record<string, string>,
+ *   credentials: RequestCredentials,
+ *   method: string,
+ *   url: string,
+ * }} RequestInit
+ */
+
+/** @type {(o: RequestInit) => () => Promise<Response>} */
+export const fetchImpl = o => () =>
+  fetch(o.url, {...o, redirect: 'manual'})

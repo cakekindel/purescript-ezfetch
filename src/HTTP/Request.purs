@@ -1,18 +1,15 @@
 module HTTP.Request
-  ( class Request
+  ( Credentials(..)
   , Body(..)
-  , RawRequestBody
+  , RawBody
   , Method(..)
+  , bodyHeaders
   , bodyToRaw
   , json
   , form
   , blob
   , arrayBuffer
-  , requestBody
-  , requestHeaders
-  , requestUrl
-  , requestMethod
-  , rawRequestBodySize
+  , rawBodySize
   ) where
 
 import Prelude
@@ -24,11 +21,7 @@ import Data.Eq.Generic (genericEq)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (unwrap)
-import Data.Nullable as Nullable
 import Data.Show.Generic (genericShow)
-import Data.Tuple.Containing (extract)
-import Data.Tuple.Nested (type (/\))
-import Data.URL (URL)
 import Effect (Effect)
 import Effect.Aff.Class (class MonadAff, liftAff)
 import Effect.Class (class MonadEffect, liftEffect)
@@ -43,25 +36,27 @@ import Unsafe.Coerce (unsafeCoerce)
 import Web.File.Blob (Blob)
 import Web.File.Blob as Blob
 
-foreign import data RawRequestBody :: Type
+foreign import data RawBody :: Type
 
 foreign import blobArrayBufferImpl :: Blob -> Effect (Promise ArrayBuffer)
-foreign import rawRequestBodySize :: RawRequestBody -> Effect Int
+foreign import rawBodySize :: RawBody -> Effect Int
 
-unsafeEmptyRawRequestBody :: RawRequestBody
-unsafeEmptyRawRequestBody = unsafeCoerce Nullable.null
+unsafeStringRawBody :: String -> RawBody
+unsafeStringRawBody = unsafeCoerce
 
-unsafeStringRawRequestBody :: String -> RawRequestBody
-unsafeStringRawRequestBody = unsafeCoerce
+unsafeFormDataToRawBody :: RawFormData -> RawBody
+unsafeFormDataToRawBody = unsafeCoerce
 
-unsafeFormDataToRawRequestBody :: RawFormData -> RawRequestBody
-unsafeFormDataToRawRequestBody = unsafeCoerce
+unsafeArrayBufferToRawBody :: ArrayBuffer -> RawBody
+unsafeArrayBufferToRawBody = unsafeCoerce
 
-unsafeArrayBufferToRawRequestBody :: ArrayBuffer -> RawRequestBody
-unsafeArrayBufferToRawRequestBody = unsafeCoerce
+unsafeBlobToRawBody :: forall m. MonadAff m => Blob -> m RawBody
+unsafeBlobToRawBody = map unsafeArrayBufferToRawBody <<< liftAff <<< Promise.toAffE <<< blobArrayBufferImpl
 
-unsafeBlobToRawRequestBody :: forall m. MonadAff m => Blob -> m RawRequestBody
-unsafeBlobToRawRequestBody = map unsafeArrayBufferToRawRequestBody <<< liftAff <<< Promise.toAffE <<< blobArrayBufferImpl
+data Credentials
+  = IncludeCredentials
+  | OmitCredentials
+  | SameSiteCredentials
 
 data Body
   = BodyString String (Maybe ContentType)
@@ -89,11 +84,11 @@ bodyHeaders (BodyString _ ct) = liftEffect $ Header.headers ct
 bodyHeaders (BodyArrayBuffer _ ct) = liftEffect $ Header.headers ct
 bodyHeaders (BodyBlob b) = liftEffect $ Header.headers <<< map (ContentType <<< MIME.fromString <<< unwrap) $ Blob.type_ b
 
-bodyToRaw :: forall m. MonadAff m => Body -> m (Maybe RawRequestBody)
-bodyToRaw (BodyString body _) = pure $ Just $ unsafeStringRawRequestBody body
-bodyToRaw (BodyArrayBuffer body _) = pure $ Just $ unsafeArrayBufferToRawRequestBody body
-bodyToRaw (BodyForm form') = map Just $ map unsafeFormDataToRawRequestBody $ Form.toRawFormData form'
-bodyToRaw (BodyBlob body) = map Just $ unsafeBlobToRawRequestBody body
+bodyToRaw :: forall m. MonadAff m => Body -> m (Maybe RawBody)
+bodyToRaw (BodyString body _) = pure $ Just $ unsafeStringRawBody body
+bodyToRaw (BodyArrayBuffer body _) = pure $ Just $ unsafeArrayBufferToRawBody body
+bodyToRaw (BodyForm form') = map Just $ map unsafeFormDataToRawBody $ Form.toRawFormData form'
+bodyToRaw (BodyBlob body) = map Just $ unsafeBlobToRawBody body
 bodyToRaw BodyEmpty = pure Nothing
 
 data Method
@@ -111,57 +106,3 @@ instance Eq Method where
 instance Show Method where
   show = genericShow
 
-class Request :: Type -> Constraint
-class Request a where
-  requestUrl :: forall m. MonadAff m => a -> m URL
-  requestMethod :: forall m. MonadAff m => a -> m Method
-  requestBody :: forall m. MonadAff m => a -> m Body
-  requestHeaders :: forall m. MonadAff m => a -> m Headers
-
-instance Request (Method /\ URL /\ Body /\ Effect Headers) where
-  requestUrl = pure <<< extract
-  requestMethod = pure <<< extract
-  requestBody = pure <<< extract
-  requestHeaders req = do
-    hs <- liftEffect $ extract req
-    bodyHs <- bodyHeaders $ extract req
-    pure $ hs <> bodyHs
-
-instance Request (Method /\ URL /\ Body /\ Headers) where
-  requestUrl = pure <<< extract
-  requestMethod = pure <<< extract
-  requestBody = pure <<< extract
-  requestHeaders req = do
-    let hs = extract req
-    bodyHs <- bodyHeaders $ extract req
-    pure $ hs <> bodyHs
-
-instance Request (Method /\ URL /\ Body) where
-  requestUrl = pure <<< extract
-  requestMethod = pure <<< extract
-  requestBody = pure <<< extract
-  requestHeaders _ = pure mempty
-
-instance Request (Method /\ URL /\ Headers) where
-  requestUrl = pure <<< extract
-  requestMethod = pure <<< extract
-  requestBody _ = pure BodyEmpty
-  requestHeaders = pure <<< extract
-
-instance Request (Method /\ URL /\ Effect Headers) where
-  requestUrl = pure <<< extract
-  requestMethod = pure <<< extract
-  requestBody _ = pure BodyEmpty
-  requestHeaders = liftEffect <<< extract @(Effect Headers)
-
-instance Request (Method /\ URL) where
-  requestUrl = pure <<< extract
-  requestMethod = pure <<< extract
-  requestBody _ = pure BodyEmpty
-  requestHeaders _ = pure mempty
-
-instance Request URL where
-  requestUrl = pure
-  requestMethod _ = pure GET
-  requestBody _ = pure BodyEmpty
-  requestHeaders _ = pure mempty

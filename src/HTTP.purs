@@ -4,30 +4,72 @@ import Prelude
 
 import Control.Promise (Promise)
 import Control.Promise as Promise
+import Data.Newtype (unwrap)
 import Data.Nullable (Nullable)
 import Data.Nullable as Nullable
 import Data.URL (URL)
+import Data.URL as URL
 import Effect (Effect)
 import Effect.Aff.Class (class MonadAff, liftAff)
 import Foreign.Object (Object)
 import Foreign.Object as Object
-import HTTP.Header (Headers(..))
+import HTTP.Header (Headers)
 import HTTP.Header (headers) as X
-import HTTP.Request (bodyToRaw)
-import HTTP.Request (class Request, Method(..)) as X
+import HTTP.Request (Body(..), Credentials(..), Method, RawBody, bodyHeaders, bodyToRaw)
+import HTTP.Request (Method(..)) as X
 import HTTP.Request as Req
 import HTTP.Response (Response)
+import Prim.Row (class Nub, class Union)
+import Record as Record
+import Type.Prelude (Proxy(..))
 
-foreign import fetchImpl :: URL -> String -> Object String -> Nullable Req.RawRequestBody -> Effect (Promise Response)
+foreign import fetchImpl
+  :: forall r
+   . Record
+       ( body :: Nullable RawBody
+       , headers :: Object String
+       , credentials :: String
+       , method :: String
+       , url :: String
+       | r
+       )
+  -> Effect (Promise Response)
 
-fetch :: forall m a. MonadAff m => Req.Request a => a -> m Response
-fetch req = do
-  url <- Req.requestUrl req
-  method <- Req.requestMethod req
-  body <- Req.requestBody req
-  bodyRaw <- bodyToRaw body
-  Headers headers <- Req.requestHeaders req
+type OptionalFields =
+  ( body :: Body
+  , headers :: Headers
+  , credentials :: Credentials
+  )
 
+makeOptionalFields
+  :: forall @x xm o
+   . Nub o OptionalFields
+  => Union x OptionalFields o
+  => Union x xm OptionalFields
+  => {|x}
+  -> Record OptionalFields
+makeOptionalFields x =
+  let
+    default :: Record OptionalFields
+    default =
+      { body: BodyEmpty
+      , headers: mempty
+      , credentials: SameSiteCredentials
+      }
+  in
+    Record.merge x default
+
+fetch
+  :: forall x xm m o
+   . MonadAff m
+  => Nub o OptionalFields
+  => Union x OptionalFields o
+  => Union x xm OptionalFields
+  => URL
+  -> Method
+  -> {|x}
+  -> m Response
+fetch url method x = do
   let
     methodStr = case method of
       Req.GET -> "GET"
@@ -36,6 +78,25 @@ fetch req = do
       Req.PATCH -> "PATCH"
       Req.DELETE -> "DELETE"
       Req.HEAD -> "HEAD"
-    headers' = Object.fromFoldableWithIndex headers
 
-  liftAff $ Promise.toAffE $ fetchImpl url methodStr headers' $ Nullable.toNullable bodyRaw
+    credsStr = case _ of
+      SameSiteCredentials -> "same-origin"
+      OmitCredentials -> "omit"
+      IncludeCredentials -> "include"
+
+    fields =
+      Record.modify (Proxy @"credentials") credsStr
+      $ Record.modify (Proxy @"headers") (Object.fromFoldableWithIndex <<< unwrap)
+      $ Record.insert (Proxy @"method") methodStr
+      $ Record.insert (Proxy @"url") (URL.toString url)
+      $ makeOptionalFields @x x
+
+  bodyHeaders' <- (Object.fromFoldableWithIndex <<< unwrap) <$> bodyHeaders fields.body
+  bodyRaw <- Nullable.toNullable <$> bodyToRaw fields.body
+  let
+    fields' =
+      Record.modify (Proxy @"headers") (Object.union bodyHeaders')
+      $ Record.set (Proxy @"body") bodyRaw
+      $ fields
+
+  liftAff $ Promise.toAffE $ fetchImpl fields'
