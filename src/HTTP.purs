@@ -41,35 +41,35 @@ type OptionalFields =
   , credentials :: Credentials
   )
 
+defaults :: Record OptionalFields
+defaults =
+  { body: BodyEmpty
+  , headers: mempty
+  , credentials: SameSiteCredentials
+  }
+
 makeOptionalFields
   :: forall @x xm o
    . Nub o OptionalFields
   => Union x OptionalFields o
   => Union x xm OptionalFields
-  => {|x}
+  => Record OptionalFields
+  -> {|x}
   -> Record OptionalFields
-makeOptionalFields x =
-  let
-    default :: Record OptionalFields
-    default =
-      { body: BodyEmpty
-      , headers: mempty
-      , credentials: SameSiteCredentials
-      }
-  in
-    Record.merge x default
+makeOptionalFields d x = Record.merge x d
 
-fetch
+fetchWithDefaults
   :: forall x xm m o
    . MonadAff m
   => Nub o OptionalFields
   => Union x OptionalFields o
   => Union x xm OptionalFields
-  => Method
+  => Record OptionalFields
+  -> Method
   -> URL
   -> {|x}
   -> m Response
-fetch method url x = do
+fetchWithDefaults defaults' method url x =
   let
     methodStr = case method of
       Req.GET -> "GET"
@@ -89,14 +89,26 @@ fetch method url x = do
       $ Record.modify (Proxy @"headers") (Object.fromFoldableWithIndex <<< unwrap)
       $ Record.insert (Proxy @"method") methodStr
       $ Record.insert (Proxy @"url") (URL.toString url)
-      $ makeOptionalFields @x x
+      $ makeOptionalFields @x defaults' x
+  in do
+    bodyHeaders' <- (Object.fromFoldableWithIndex <<< unwrap) <$> bodyHeaders fields.body
+    bodyRaw <- Nullable.toNullable <$> bodyToRaw fields.body
+    let
+      fields' =
+        Record.modify (Proxy @"headers") (Object.union bodyHeaders')
+        $ Record.set (Proxy @"body") bodyRaw
+        $ fields
 
-  bodyHeaders' <- (Object.fromFoldableWithIndex <<< unwrap) <$> bodyHeaders fields.body
-  bodyRaw <- Nullable.toNullable <$> bodyToRaw fields.body
-  let
-    fields' =
-      Record.modify (Proxy @"headers") (Object.union bodyHeaders')
-      $ Record.set (Proxy @"body") bodyRaw
-      $ fields
+    liftAff $ Promise.toAffE $ fetchImpl fields'
 
-  liftAff $ Promise.toAffE $ fetchImpl fields'
+fetch
+  :: forall x xm m o
+   . MonadAff m
+  => Nub o OptionalFields
+  => Union x OptionalFields o
+  => Union x xm OptionalFields
+  => Method
+  -> URL
+  -> {|x}
+  -> m Response
+fetch = fetchWithDefaults defaults
