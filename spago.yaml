@@ -1,33 +1,33 @@
 package:
   dependencies:
-    - aff
-    - aff-promise
-    - arraybuffer
-    - arraybuffer-types
-    - b64
-    - bifunctors
-    - effect
-    - either
-    - exceptions
-    - foldable-traversable
-    - foreign
-    - foreign-object
-    - integers
-    - maybe
-    - newtype
-    - node-buffer
-    - node-streams
-    - nullable
-    - numbers
-    - ordered-collections
-    - prelude
-    - simple-json
-    - transformers
-    - tuples
-    - unsafe-coerce
-    - url
-    - web-file
-    - web-streams
+    - aff: ">=7.1.0 <8.0.0"
+    - aff-promise: ">=4.0.0 <5.0.0"
+    - arraybuffer: ">=13.2.0 <14.0.0"
+    - arraybuffer-types: ">=3.0.2 <4.0.0"
+    - b64: ">=0.0.8 <0.0.9"
+    - bifunctors: ">=6.0.0 <7.0.0"
+    - effect: ">=4.0.0 <5.0.0"
+    - either: ">=6.1.0 <7.0.0"
+    - exceptions: ">=6.0.0 <7.0.0"
+    - foldable-traversable: ">=6.0.0 <7.0.0"
+    - foreign: ">=7.0.0 <8.0.0"
+    - foreign-object: ">=4.1.0 <5.0.0"
+    - integers: ">=6.0.0 <7.0.0"
+    - maybe: ">=6.0.0 <7.0.0"
+    - newtype: ">=5.0.0 <6.0.0"
+    - node-buffer: ">=9.0.0 <10.0.0"
+    - node-streams: ">=9.0.0 <10.0.0"
+    - nullable: ">=6.0.0 <7.0.0"
+    - numbers: ">=9.0.1 <10.0.0"
+    - ordered-collections: ">=3.2.0 <4.0.0"
+    - prelude: ">=6.0.1 <7.0.0"
+    - simple-json: ">=9.0.0 <10.0.0"
+    - transformers: ">=6.0.0 <7.0.0"
+    - tuples: ">=7.0.0 <8.0.0"
+    - unsafe-coerce: ">=6.0.0 <7.0.0"
+    - url: "*"
+    - web-file: ">=4.0.0 <5.0.0"
+    - web-streams: ">=4.0.0 <5.0.0"
   name: fetch
 workspace:
   extraPackages:
@@ -47,6 +47,3 @@ workspace:
         - prelude
         - strings
         - tuples
-  packageSet:
-    url: https://raw.githubusercontent.com/purescript/package-sets/psc-0.15.10-20230930/packages.json
-    hash: sha256-nTsd44o7/hrTdk0c6dh0wyBqhFFDJJIeKdQU6L1zv/A=
