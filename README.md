@@ -10,7 +10,7 @@ fetch <method> <url> <options>
 
 * `<method>` is `Effect.Aff.HTTP.Request.Method`:
 
-        <!-- language: purescript -->
+    <!-- language: purescript -->
         data Method
           = GET
           | PUT
@@ -22,7 +22,7 @@ fetch <method> <url> <options>
 * `<url>` is `Data.URL.URL` (from [`url-immutable`](https://pursuit.purescript.org/packages/purescript-url-immutable/))
 * `<options>` is a partial record of:
 
-        <!-- language: purescript -->
+    <!-- language: purescript -->
         type OptionalFields =
           ( body :: Body
           , headers :: Headers
