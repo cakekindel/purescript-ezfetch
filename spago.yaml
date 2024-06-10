@@ -1,6 +1,12 @@
 workspace: {}
 package:
   name: 'ezfetch'
+  publish:
+    version: '0.0.0'
+    license: 'GPL-3.0-or-later'
+    location:
+      githubOwner: 'cakekindel'
+      githubRepo: 'purescript-ezfetch'
   dependencies:
     - aff: ">=7.1.0 <8.0.0"
     - aff-promise: ">=4.0.0 <5.0.0"
