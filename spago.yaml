@@ -1,6 +1,9 @@
 workspace: {}
 package:
   name: 'ezfetch'
+  build:
+    strict: true
+    pedanticPackages: true
   publish:
     version: '1.0.2'
     license: 'GPL-3.0-or-later'
@@ -10,7 +13,6 @@ package:
   dependencies:
     - aff: ">=7.1.0 <8.0.0"
     - aff-promise: ">=4.0.0 <5.0.0"
-    - arraybuffer: ">=13.2.0 <14.0.0"
     - arraybuffer-types: ">=3.0.2 <4.0.0"
     - b64: ">=0.0.8 <0.0.9"
     - bifunctors: ">=6.0.0 <7.0.0"
@@ -29,9 +31,11 @@ package:
     - numbers: ">=9.0.1 <10.0.0"
     - ordered-collections: ">=3.2.0 <4.0.0"
     - prelude: ">=6.0.1 <7.0.0"
+    - record: ">=4.0.0 <5.0.0"
     - simple-json: ">=9.0.0 <10.0.0"
     - transformers: ">=6.0.0 <7.0.0"
     - tuples: ">=7.0.0 <8.0.0"
+    - typelevel-prelude: ">=7.0.0 <8.0.0"
     - unsafe-coerce: ">=6.0.0 <7.0.0"
     - url-immutable: ">=1.0.0 <2.0.0"
     - web-file: ">=4.0.0 <5.0.0"
