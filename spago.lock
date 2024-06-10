@@ -1,6 +1,6 @@
 workspace:
   packages:
-    fetch:
+    ezfetch:
       path: ./
       dependencies:
         - aff: ">=7.1.0 <8.0.0"
@@ -28,7 +28,7 @@ workspace:
         - transformers: ">=6.0.0 <7.0.0"
         - tuples: ">=7.0.0 <8.0.0"
         - unsafe-coerce: ">=6.0.0 <7.0.0"
-        - url: "*"
+        - url-immutable: ">=1.0.0 <2.0.0"
         - web-file: ">=4.0.0 <5.0.0"
         - web-streams: ">=4.0.0 <5.0.0"
       test_dependencies: []
@@ -86,6 +86,7 @@ workspace:
         - simple-json
         - st
         - strings
+        - stringutils
         - tailrec
         - transformers
         - tuples
@@ -94,29 +95,13 @@ workspace:
         - uint
         - unfoldable
         - unsafe-coerce
-        - url
+        - url-immutable
         - variant
         - web-dom
         - web-events
         - web-file
         - web-streams
-  extra_packages:
-    url:
-      git: https://git.orionkindel.com/thunderstrike/purescript-url-immutable.git
-      ref: dbfa3b6
-      dependencies:
-        - arrays
-        - effect
-        - filterable
-        - foldable-traversable
-        - integers
-        - maybe
-        - newtype
-        - nullable
-        - ordered-collections
-        - prelude
-        - strings
-        - tuples
+  extra_packages: {}
 packages:
   aff:
     type: registry
@@ -701,6 +686,17 @@ packages:
       - tuples
       - unfoldable
       - unsafe-coerce
+  stringutils:
+    type: registry
+    version: 0.0.12
+    integrity: sha256-t63QWBlp49U0nRqUcFryKflSJsNKGTQAHKjn24/+ooI=
+    dependencies:
+      - arrays
+      - integers
+      - maybe
+      - partial
+      - prelude
+      - strings
   tailrec:
     type: registry
     version: 6.1.0
@@ -779,22 +775,28 @@ packages:
     version: 6.0.0
     integrity: sha256-IqIYW4Vkevn8sI+6aUwRGvd87tVL36BBeOr0cGAE7t0=
     dependencies: []
-  url:
-    type: git
-    url: https://git.orionkindel.com/thunderstrike/purescript-url-immutable.git
-    rev: dbfa3b6e3b01b2d6c7b02202054d52754f000b20
+  url-immutable:
+    type: registry
+    version: 1.0.0
+    integrity: sha256-6uCg5k4fjrqyTYUYKTmcykXgXCJKsvVpzx+gZJczAx0=
     dependencies:
       - arrays
-      - effect
+      - bifunctors
+      - either
       - filterable
       - foldable-traversable
+      - foreign
       - integers
       - maybe
       - newtype
       - nullable
       - ordered-collections
+      - partial
       - prelude
+      - simple-json
       - strings
+      - stringutils
+      - transformers
       - tuples
   variant:
     type: registry

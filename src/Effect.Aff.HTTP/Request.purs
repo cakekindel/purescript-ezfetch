@@ -1,4 +1,4 @@
-module HTTP.Request
+module Effect.Aff.HTTP.Request
   ( Credentials(..)
   , Body(..)
   , RawBody
@@ -25,12 +25,12 @@ import Data.Show.Generic (genericShow)
 import Effect (Effect)
 import Effect.Aff.Class (class MonadAff, liftAff)
 import Effect.Class (class MonadEffect, liftEffect)
-import HTTP.Form (Form, RawFormData)
-import HTTP.Form as Form
-import HTTP.Header (ContentType(..), Headers)
-import HTTP.Header as Header
-import HTTP.MIME (MIME)
-import HTTP.MIME as MIME
+import Effect.Aff.HTTP.Form (Form, RawFormData)
+import Effect.Aff.HTTP.Form as Form
+import Effect.Aff.HTTP.Header (ContentType(..), Headers)
+import Effect.Aff.HTTP.Header as Header
+import Data.MIME (MIME)
+import Data.MIME as MIME
 import Simple.JSON (class WriteForeign, writeJSON)
 import Unsafe.Coerce (unsafeCoerce)
 import Web.File.Blob (Blob)

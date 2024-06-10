@@ -1,4 +1,4 @@
-module HTTP (fetch, fetchWithDefaults, OptionalFields, module X) where
+module Effect.Aff.HTTP (fetch, fetchWithDefaults, OptionalFields, module X) where
 
 import Prelude
 
@@ -13,12 +13,12 @@ import Effect (Effect)
 import Effect.Aff.Class (class MonadAff, liftAff)
 import Foreign.Object (Object)
 import Foreign.Object as Object
-import HTTP.Header (Headers)
-import HTTP.Header (headers) as X
-import HTTP.Request (Body(..), Credentials(..), Method, RawBody, bodyHeaders, bodyToRaw)
-import HTTP.Request (Method(..)) as X
-import HTTP.Request as Req
-import HTTP.Response (Response)
+import Effect.Aff.HTTP.Header (Headers)
+import Effect.Aff.HTTP.Header (headers) as X
+import Effect.Aff.HTTP.Request (Body(..), Credentials(..), Method, RawBody, bodyHeaders, bodyToRaw)
+import Effect.Aff.HTTP.Request (Method(..)) as X
+import Effect.Aff.HTTP.Request as Req
+import Effect.Aff.HTTP.Response (Response)
 import Prim.Row (class Nub, class Union)
 import Record as Record
 import Type.Prelude (Proxy(..))
@@ -54,7 +54,7 @@ makeOptionalFields
   => Union x OptionalFields o
   => Union x xm OptionalFields
   => Record OptionalFields
-  -> {|x}
+  -> { | x }
   -> Record OptionalFields
 makeOptionalFields d x = Record.merge x d
 
@@ -67,7 +67,7 @@ fetchWithDefaults
   => Record OptionalFields
   -> Method
   -> URL
-  -> {|x}
+  -> { | x }
   -> m Response
 fetchWithDefaults defaults' method url x =
   let
@@ -86,20 +86,21 @@ fetchWithDefaults defaults' method url x =
 
     fields =
       Record.modify (Proxy @"credentials") credsStr
-      $ Record.modify (Proxy @"headers") (Object.fromFoldableWithIndex <<< unwrap)
-      $ Record.insert (Proxy @"method") methodStr
-      $ Record.insert (Proxy @"url") (URL.toString url)
-      $ makeOptionalFields @x defaults' x
-  in do
-    bodyHeaders' <- (Object.fromFoldableWithIndex <<< unwrap) <$> bodyHeaders fields.body
-    bodyRaw <- Nullable.toNullable <$> bodyToRaw fields.body
-    let
-      fields' =
-        Record.modify (Proxy @"headers") (Object.union bodyHeaders')
-        $ Record.set (Proxy @"body") bodyRaw
-        $ fields
+        $ Record.modify (Proxy @"headers") (Object.fromFoldableWithIndex <<< unwrap)
+        $ Record.insert (Proxy @"method") methodStr
+        $ Record.insert (Proxy @"url") (URL.toString url)
+        $ makeOptionalFields @x defaults' x
+  in
+    do
+      bodyHeaders' <- (Object.fromFoldableWithIndex <<< unwrap) <$> bodyHeaders fields.body
+      bodyRaw <- Nullable.toNullable <$> bodyToRaw fields.body
+      let
+        fields' =
+          Record.modify (Proxy @"headers") (Object.union bodyHeaders')
+            $ Record.set (Proxy @"body") bodyRaw
+            $ fields
 
-    liftAff $ Promise.toAffE $ fetchImpl fields'
+      liftAff $ Promise.toAffE $ fetchImpl fields'
 
 fetch
   :: forall x xm m o
@@ -109,6 +110,6 @@ fetch
   => Union x xm OptionalFields
   => Method
   -> URL
-  -> {|x}
+  -> { | x }
   -> m Response
 fetch = fetchWithDefaults defaults

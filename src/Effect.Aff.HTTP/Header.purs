@@ -1,4 +1,4 @@
-module HTTP.Header where
+module Effect.Aff.HTTP.Header where
 
 import Prelude
 
@@ -14,8 +14,8 @@ import Data.String.Base64 as String.Base64
 import Data.Tuple (Tuple(..))
 import Effect (Effect)
 import Effect.Class (class MonadEffect, liftEffect)
-import HTTP.MIME (MIME)
-import HTTP.MIME as MIME
+import Data.MIME (MIME)
+import Data.MIME as MIME
 
 newtype ContentType = ContentType MIME
 

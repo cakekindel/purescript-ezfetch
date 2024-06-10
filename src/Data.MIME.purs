@@ -1,4 +1,4 @@
-module HTTP.MIME where
+module Data.MIME where
 
 import Prelude
 

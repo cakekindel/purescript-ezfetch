@@ -1,5 +1,5 @@
-import { Readable } from 'stream';
-import { Buffer } from 'buffer';
+import { Readable } from 'stream'
+import { Buffer } from 'buffer'
 
 /** @type {(r: Response) => () => Promise<Buffer>} */
 export const bufferImpl = r => async () => Buffer.from(await r.arrayBuffer())
@@ -10,7 +10,7 @@ export const streamImpl = r => () => {
     throw new Error('Response body is empty')
   }
 
-  const reader = r.body.getReader();
+  const reader = r.body.getReader()
   return new Readable({
     read() {
       reader

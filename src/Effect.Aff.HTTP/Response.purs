@@ -1,4 +1,4 @@
-module HTTP.Response
+module Effect.Aff.HTTP.Response
   ( Response(..)
   , stream
   , clone
@@ -31,8 +31,8 @@ import Effect.Class (class MonadEffect, liftEffect)
 import Effect.Exception (Error, error)
 import Foreign (Foreign)
 import Foreign.Object (Object)
-import HTTP.Form (Form, RawFormData)
-import HTTP.Form as Form
+import Effect.Aff.HTTP.Form (Form, RawFormData)
+import Effect.Aff.HTTP.Form as Form
 import Simple.JSON (class ReadForeign, readImpl)
 import Web.File.Blob (Blob)
 import Web.Streams.ReadableStream (ReadableStream)

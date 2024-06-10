@@ -1,4 +1,4 @@
-module HTTP.Response.Node
+module Effect.Aff.HTTP.Response.Node
   ( module X
   , buffer
   , stream
@@ -11,8 +11,8 @@ import Control.Promise as Promise
 import Effect (Effect)
 import Effect.Aff.Class (class MonadAff, liftAff)
 import Effect.Class (class MonadEffect, liftEffect)
-import HTTP.Response (Response)
-import HTTP.Response hiding (stream) as X
+import Effect.Aff.HTTP.Response (Response)
+import Effect.Aff.HTTP.Response hiding (stream) as X
 import Node.Buffer (Buffer)
 import Node.Stream (Readable)
 

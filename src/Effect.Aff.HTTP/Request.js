@@ -9,8 +9,8 @@ export const rawBodySize = body => () =>
   body instanceof ArrayBuffer
     ? body.byteLength
     : body instanceof FormData
-    ? Array.from(body.entries()).reduce(
-        (size, [k, v]) => size + k.length + formDataValueSize(v),
-        0,
-      )
-    : 0
+      ? Array.from(body.entries()).reduce(
+          (size, [k, v]) => size + k.length + formDataValueSize(v),
+          0,
+        )
+      : 0

@@ -9,5 +9,4 @@
  */
 
 /** @type {(o: RequestInit) => () => Promise<Response>} */
-export const fetchImpl = o => () =>
-  fetch(o.url, {...o, redirect: 'manual'})
+export const fetchImpl = o => () => fetch(o.url, { ...o, redirect: 'manual' })

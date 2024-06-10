@@ -1,4 +1,4 @@
-module HTTP.Form where
+module Effect.Aff.HTTP.Form where
 
 import Prelude
 
@@ -25,8 +25,8 @@ import Effect.Exception (error)
 import Foreign (Foreign, unsafeReadTagged, unsafeToForeign)
 import Foreign.Object (Object)
 import Foreign.Object as Object
-import HTTP.MIME (MIME)
-import HTTP.MIME as MIME
+import Data.MIME (MIME)
+import Data.MIME as MIME
 import Simple.JSON (readImpl, unsafeStringify)
 import Unsafe.Coerce (unsafeCoerce)
 import Web.File.Blob (Blob)

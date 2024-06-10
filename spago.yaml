@@ -1,4 +1,6 @@
+workspace: {}
 package:
+  name: 'ezfetch'
   dependencies:
     - aff: ">=7.1.0 <8.0.0"
     - aff-promise: ">=4.0.0 <5.0.0"
@@ -25,25 +27,6 @@ package:
     - transformers: ">=6.0.0 <7.0.0"
     - tuples: ">=7.0.0 <8.0.0"
     - unsafe-coerce: ">=6.0.0 <7.0.0"
-    - url: "*"
+    - url-immutable: ">=1.0.0 <2.0.0"
     - web-file: ">=4.0.0 <5.0.0"
     - web-streams: ">=4.0.0 <5.0.0"
-  name: fetch
-workspace:
-  extraPackages:
-    url:
-      git: 'https://git.orionkindel.com/thunderstrike/purescript-url-immutable.git'
-      ref: 'dbfa3b6'
-      dependencies:
-        - arrays
-        - effect
-        - filterable
-        - foldable-traversable
-        - integers
-        - maybe
-        - newtype
-        - nullable
-        - ordered-collections
-        - prelude
-        - strings
-        - tuples

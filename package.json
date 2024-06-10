@@ -1,5 +1,5 @@
 {
-  "name": "purs",
+  "name": "purescript-ezfetch",
   "private": true,
   "module": "index.js",
   "type": "module",
