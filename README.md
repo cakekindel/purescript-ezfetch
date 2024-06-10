@@ -8,23 +8,36 @@ The main entry point is `Effect.Aff.HTTP.fetch`:
 fetch <method> <url> <options>
 ```
 
-* `<method>` is `Effect.Aff.HTTP.Request.Method`:
+<ul>
+<li>
 
-    <!-- language: purescript -->
-        data Method
-          = GET
-          | PUT
-          | POST
-          | DELETE
-          | PATCH
-          | HEAD
+`<method>` is `Effect.Aff.HTTP.Request.Method`:
 
-* `<url>` is `Data.URL.URL` (from [`url-immutable`](https://pursuit.purescript.org/packages/purescript-url-immutable/))
-* `<options>` is a partial record of:
+```purescript
+data Method
+  = GET
+  | PUT
+  | POST
+  | DELETE
+  | PATCH
+  | HEAD
+```
+</li>
 
-    <!-- language: purescript -->
-        type OptionalFields =
-          ( body :: Body
-          , headers :: Headers
-          , credentials :: Credentials
-          )
+<li>
+
+`<url>` is `Data.URL.URL` (from [`url-immutable`](https://pursuit.purescript.org/packages/purescript-url-immutable/))
+</li>
+<li>
+
+`<options>` is a partial record of:
+
+```purescript
+type OptionalFields =
+  ( body :: Body
+  , headers :: Headers
+  , credentials :: Credentials
+  )
+```
+</li>
+</ul>
