@@ -5,6 +5,7 @@ workspace:
       dependencies:
         - aff: ">=7.1.0 <8.0.0"
         - aff-promise: ">=4.0.0 <5.0.0"
+        - arraybuffer: ">=13.2.0 <14.0.0"
         - arraybuffer-types: ">=3.0.2 <4.0.0"
         - b64: ">=0.0.8 <0.0.9"
         - bifunctors: ">=6.0.0 <7.0.0"
@@ -34,6 +35,7 @@ workspace:
       build_plan:
         - aff
         - aff-promise
+        - arraybuffer
         - arraybuffer-types
         - arrays
         - b64
@@ -50,6 +52,7 @@ workspace:
         - exceptions
         - exists
         - filterable
+        - float32
         - foldable-traversable
         - foreign
         - foreign-object
@@ -89,6 +92,7 @@ workspace:
         - tuples
         - type-equality
         - typelevel-prelude
+        - uint
         - unfoldable
         - unsafe-coerce
         - url-immutable
@@ -128,6 +132,23 @@ packages:
     dependencies:
       - aff
       - foreign
+  arraybuffer:
+    type: registry
+    version: 13.2.0
+    integrity: sha256-fNsR19aRqcUis9C28MpyMigIlfX6f6Hq1up4IcTOvDU=
+    dependencies:
+      - arraybuffer-types
+      - arrays
+      - effect
+      - float32
+      - functions
+      - gen
+      - maybe
+      - nullable
+      - prelude
+      - tailrec
+      - uint
+      - unfoldable
   arraybuffer-types:
     type: registry
     version: 3.0.2
@@ -298,6 +319,14 @@ packages:
       - identity
       - lists
       - ordered-collections
+  float32:
+    type: registry
+    version: 2.0.0
+    integrity: sha256-PRRdv0zNZ8JdohWTO3ZSLzt51ymxK4/NHtGTwuMWHtw=
+    dependencies:
+      - gen
+      - maybe
+      - prelude
   foldable-traversable:
     type: registry
     version: 6.0.0
@@ -720,6 +749,17 @@ packages:
     dependencies:
       - prelude
       - type-equality
+  uint:
+    type: registry
+    version: 7.0.0
+    integrity: sha256-fQ30YjiKz9DS6yqRdmK+WARVbJhpZDDTRcpFw675b6M=
+    dependencies:
+      - effect
+      - enums
+      - gen
+      - maybe
+      - numbers
+      - prelude
   unfoldable:
     type: registry
     version: 6.0.0
